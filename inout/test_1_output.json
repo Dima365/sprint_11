@@ -1,0 +1,37 @@
+[
+    {
+        "buses": [
+            "114",
+            "144"
+        ],
+        "request_id": 1
+    },
+    {
+        "error_message": "not found",
+        "request_id": 2
+    },
+    {
+        "curvature": 1.23199,
+        "request_id": 3,
+        "route_length": 1700,
+        "stop_count": 3,
+        "unique_stop_count": 2
+    },
+    {
+        "buses": [
+
+        ],
+        "request_id": 4
+    },
+    {
+        "curvature": 6.95112e-05,
+        "request_id": 5,
+        "route_length": 850,
+        "stop_count": 4,
+        "unique_stop_count": 3
+    },
+    {
+        "error_message": "not found",
+        "request_id": 6
+    }
+]
