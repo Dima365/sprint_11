@@ -1,0 +1,52 @@
+{
+  "base_requests": [
+    {
+      "type": "Bus",
+      "name": "114",
+      "stops": ["Морской вокзал", "Ривьерский мост"],
+      "is_roundtrip": false
+    },
+    {
+      "type": "Stop",
+      "name": "Ривьерский мост",
+      "latitude": 43.587795,
+      "longitude": 39.716901,
+      "road_distances": {"Морской вокзал": 850}
+    },
+    {
+      "type": "Stop",
+      "name": "Универ",
+      "latitude": 43,
+      "longitude": -39,
+      "road_distances": {"Нет маршрутов": 111}
+    },
+    {
+      "type": "Stop",
+      "name": "Нет маршрутов",
+      "latitude": 43.581969,
+      "longitude": 39.719848,
+      "road_distances": {"Ривьерский мост": 850}
+    },
+    {
+      "type": "Bus",
+      "name": "144",
+      "stops": ["Морской вокзал", "Ривьерский мост", "Универ", "Морской вокзал"],
+      "is_roundtrip": true
+    },
+    {
+      "type": "Stop",
+      "name": "Морской вокзал",
+      "latitude": 43.581969,
+      "longitude": 39.719848,
+      "road_distances": {"Ривьерский мост": 850}
+    }
+  ],
+  "stat_requests": [
+    { "id": 1, "type": "Stop", "name": "Ривьерский мост" },
+    { "id": 2, "type": "Bus", "name": "121" },
+    { "id": 3, "type": "Bus", "name": "114" },
+    { "id": 4, "type": "Stop", "name": "Нет маршрутов" },
+    { "id": 5, "type": "Bus", "name": "144" },
+    { "id": 6, "type": "Stop", "name": "Нет такой остановки" }
+  ]
+}
