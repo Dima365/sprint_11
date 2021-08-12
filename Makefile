@@ -10,7 +10,8 @@ SOURCES=main.cpp \
         src/svg.cpp \
         src/transport_catalogue.cpp \
         tests/src/tests_transport.cpp \
-				src/geo.cpp
+				src/geo.cpp \
+				src/json_builder.cpp
 OBJECTS=$(SOURCES:.cpp=.o)
 EXECUTABLE=main
 

@@ -21,7 +21,7 @@ class Node final
     : private std::variant<std::nullptr_t, Array, Dict, bool, int, double, std::string> {
 public:
     using variant::variant;
-	using Value = variant;
+	  using Value = variant;
     
     Node(Value value) : variant(std::move(value)) {}
 
