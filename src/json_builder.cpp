@@ -14,7 +14,7 @@ Builder& Builder::StartDict() {
 
   Node* ptr = new Node{Dict{}};
   nodes_stack_.push_back(ptr);
-  keys_.emplace_back(nullopt);
+  keys_.push_back(nullopt);
   return *this;
 }
 
@@ -35,12 +35,12 @@ Builder& Builder::Key(string str) {
 
   if (nodes_stack_.back()->IsDict()) {
     if (keys_.back()) {
-      throw logic_error("Key error"s);
+      throw logic_error("key"s);
     } else {
-      keys_[keys_.size() - 1] = move(str);
+      keys_.back() = move(str);
     }
   } else {
-    throw std::logic_error("Not a dict"s);
+    throw std::logic_error("not a dict"s);
   }
   return *this;
 }
@@ -51,73 +51,53 @@ Builder& Builder::Value(json::Node node) {
   }
 
   if (nodes_stack_.back()->IsDict()) {
-    auto& cont = nodes_stack_.back()->GetValue();
-    Dict& dict = get<Dict>(cont);
-    if (keys_[keys_.size() - 1] == nullopt) {
-      throw logic_error("Key error"s);
+    if (!keys_.back()) {
+      throw logic_error("key"s);
     }
+
+    auto& value = nodes_stack_.back()->GetValue();
+    Dict& dict = get<Dict>(value);
     dict[*keys_.back()] = move(node);
-    keys_[keys_.size() - 1] = nullopt;
+    keys_.back() = nullopt;
 
   } else if (nodes_stack_.back()->IsArray()) {
-    auto& cont = nodes_stack_.back()->GetValue();
-    Array& array = get<Array>(cont);
+    auto& value = nodes_stack_.back()->GetValue();
+    Array& array = get<Array>(value);
     array.emplace_back(move(node));
 
   } else if (node.IsDict()) {
-    auto& cont = nodes_stack_.back()->GetValue();
-    cont = move(node.AsDict());
-    if (nodes_stack_.size() != 1) {
-      delete nodes_stack_.back();
-    }
+    auto& value = nodes_stack_.back()->GetValue();
+    value = move(node.AsDict());
     nodes_stack_.pop_back();    
   
   } else if (node.IsArray()) {
-    auto& cont = nodes_stack_.back()->GetValue();
-    cont = move(node.AsArray());
-    if (nodes_stack_.size() != 1) {
-      delete nodes_stack_.back();
-    }
+    auto& value = nodes_stack_.back()->GetValue();
+    value = move(node.AsArray());
     nodes_stack_.pop_back();
 
   } else if (node.IsString()) {
-    auto& cont = nodes_stack_.back()->GetValue();
-    cont = move(node.AsString());
-    if (nodes_stack_.size() != 1) {
-      delete nodes_stack_.back();
-    }
+    auto& value = nodes_stack_.back()->GetValue();
+    value = move(node.AsString());
     nodes_stack_.pop_back();
 
   } else if (node.IsPureDouble()) {
-    auto& cont = nodes_stack_.back()->GetValue();
-    cont = node.AsDouble();
-    if (nodes_stack_.size() != 1) {
-      delete nodes_stack_.back();
-    }
+    auto& value = nodes_stack_.back()->GetValue();
+    value = node.AsDouble();
     nodes_stack_.pop_back();
 
   } else if (node.IsInt()) {
-    auto& cont = nodes_stack_.back()->GetValue();
-    cont = node.AsInt();
-    if (nodes_stack_.size() != 1) {
-      delete nodes_stack_.back();
-    }
+    auto& value = nodes_stack_.back()->GetValue();
+    value = node.AsInt();
     nodes_stack_.pop_back();
 
   } else if (node.IsBool()) {
-    auto& cont = nodes_stack_.back()->GetValue();
-    cont = node.AsBool();
-    if (nodes_stack_.size() != 1) {
-      delete nodes_stack_.back();
-    }
+    auto& value = nodes_stack_.back()->GetValue();
+    value = node.AsBool();
     nodes_stack_.pop_back();
 
   } else if (node.IsNull()) {
-    auto& cont = nodes_stack_.back()->GetValue();
-    cont = nullptr;
-    if (nodes_stack_.size() != 1) {
-      delete nodes_stack_.back();
-    }
+    auto& value = nodes_stack_.back()->GetValue();
+    value = nullptr;
     nodes_stack_.pop_back();
   }
   return *this;
@@ -127,7 +107,7 @@ Builder& Builder::EndDict() {
   if (nodes_stack_.empty()) {
     throw logic_error("after build"s);
   } else if (!nodes_stack_.back()->IsDict()) {
-    throw logic_error("error EndDcit"s);
+    throw logic_error("EndDcit"s);
   }
 
   json::Node node = *nodes_stack_.back();
@@ -142,7 +122,7 @@ Builder& Builder::EndArray() {
   if (nodes_stack_.empty()) {
     throw logic_error("after build"s);
   } else if (!nodes_stack_.back()->IsArray()) {
-    throw logic_error("error EndArray"s);
+    throw logic_error("EndArray"s);
   }
 
   json::Node node = *nodes_stack_.back();
@@ -154,7 +134,7 @@ Builder& Builder::EndArray() {
 
 Node Builder::Build() {
   if (!nodes_stack_.empty()) {
-    throw logic_error("incomplite"s);
+    throw logic_error("incomplete"s);
   }
 
   return root_;
@@ -166,7 +146,6 @@ Builder::~Builder() {
       if (nodes_stack_.back()) {
         delete nodes_stack_.back();
       }
-      nodes_stack_.pop_back();
     }
   }
 }
