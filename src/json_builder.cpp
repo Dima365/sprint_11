@@ -7,7 +7,7 @@ Builder::Builder() {
   nodes_stack_.push_back(&root_);
 }
 
-Builder& Builder::StartDict() {
+DictItemContext Builder::StartDict() {
   if (nodes_stack_.empty()) {
     throw logic_error("after build"s);
   }
@@ -15,17 +15,17 @@ Builder& Builder::StartDict() {
   Node* ptr = new Node{Dict{}};
   nodes_stack_.push_back(ptr);
   keys_.push_back(nullopt);
-  return *this;
+  return DictItemContext{*this};
 }
 
-Builder& Builder::StartArray() {
+ArrayItemContext Builder::StartArray() {
   if (nodes_stack_.empty()) {
     throw logic_error("after build"s);
   }
 
   Node* ptr = new Node{Array{}};
   nodes_stack_.push_back(ptr);
-  return *this;
+  return ArrayItemContext{*this};
 }
 
 Builder& Builder::Key(string str) {
@@ -68,8 +68,8 @@ Builder& Builder::Value(json::Node node) {
   } else if (node.IsDict()) {
     auto& value = nodes_stack_.back()->GetValue();
     value = move(node.AsDict());
-    nodes_stack_.pop_back();    
-  
+    nodes_stack_.pop_back();
+
   } else if (node.IsArray()) {
     auto& value = nodes_stack_.back()->GetValue();
     value = move(node.AsArray());
@@ -148,4 +148,46 @@ Builder::~Builder() {
       }
     }
   }
+}
+
+DictItemContext::DictItemContext(Builder& builder) : builder_(builder) {}
+
+KeyItemContext DictItemContext::Key(std::string str) {
+  return KeyItemContext{builder_.Key(str)};
+}
+
+Builder& DictItemContext::EndDict() {
+  return builder_.EndDict();
+}
+
+KeyItemContext::KeyItemContext(Builder& builder) : builder_(builder) {}
+
+DictItemContext KeyItemContext::Value(json::Node node) {
+  return DictItemContext{builder_.Value(node)};
+}
+
+DictItemContext KeyItemContext::StartDict() {
+  return builder_.StartDict();
+}
+
+ArrayItemContext KeyItemContext::StartArray() {
+  return builder_.StartArray();
+}
+
+ArrayItemContext::ArrayItemContext(Builder& builder) : builder_(builder) {}
+
+ArrayItemContext ArrayItemContext::Value(json::Node node) {
+  return ArrayItemContext{builder_.Value(node)};
+}
+
+DictItemContext ArrayItemContext::StartDict() {
+  return builder_.StartDict();
+}
+
+ArrayItemContext ArrayItemContext::StartArray() {
+  return builder_.StartArray();
+}
+
+Builder& ArrayItemContext::EndArray() {
+  return builder_.EndArray();
 }
