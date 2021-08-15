@@ -22,7 +22,7 @@ class RequestHandler {
   void SetDistance(const std::pair<std::string, std::string>& stops,
                    uint32_t distance);
 
-  void SetRendererSettings(renderer::RenderSettings settings);
+  void SetRendererSettings(renderer::RenderSettings& settings);
 
   Bus* GetBusData(const std::string& number);
 

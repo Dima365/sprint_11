@@ -36,7 +36,7 @@ void RequestHandler::SetDistance(
   tc_.SetDistance(stops, distance);
 }
 
-void RequestHandler::SetRendererSettings(renderer::RenderSettings settings) {
+void RequestHandler::SetRendererSettings(renderer::RenderSettings& settings) {
   renderer_.SetRendererSettings(settings);
 }
 
