@@ -145,16 +145,30 @@ json::Node JsonReader::GetNodeBus(const json::Dict& map_state_request) {
   int request_id = map_state_request.at("id"s).AsInt();
   Bus* bus_ptr = handler_.GetBusData(name);
   if (bus_ptr != nullptr) {
-    json::Node node{json::Dict{{"curvature"s, bus_ptr->curvature},
-                               {"request_id"s, request_id},
-                               {"route_length"s, double(bus_ptr->routeLength)},
-                               {"stop_count"s, bus_ptr->stopsOnRoute},
-                               {"unique_stop_count"s, bus_ptr->uniqueStops}}};
-    return node;
+    return json::Builder{}
+        .StartDict()
+        .Key("curvature"s)
+        .Value(bus_ptr->curvature)
+        .Key("request_id"s)
+        .Value(request_id)
+        .Key("route_length"s)
+        .Value(double(bus_ptr->routeLength))
+        .Key("stop_count"s)
+        .Value(bus_ptr->stopsOnRoute)
+        .Key("unique_stop_count"s)
+        .Value(bus_ptr->uniqueStops)
+        .EndDict()
+        .Build();
+
   } else {
-    json::Node node{json::Dict{{"request_id"s, request_id},
-                               {"error_message"s, "not found"s}}};
-    return node;
+    return json::Builder{}
+        .StartDict()
+        .Key("request_id"s)
+        .Value(request_id)
+        .Key("error_message"s)
+        .Value("not found"s)
+        .EndDict()
+        .Build();
   }
 }
 
@@ -164,14 +178,24 @@ json::Node JsonReader::GetNodeStop(const json::Dict& map_state_request) {
   int request_id = map_state_request.at("id"s).AsInt();
   if (stop_ptr != nullptr) {
     const set<string>& buses = stop_ptr->buses;
-    json::Array array_buses{buses.begin(), buses.end()};
-    json::Node node{
-        json::Dict{{"buses"s, array_buses}, {"request_id"s, request_id}}};
-    return node;
+    return json::Builder{}
+        .StartDict()
+        .Key("buses"s)
+        .Value(json::Array{buses.begin(), buses.end()})
+        .Key("request_id"s)
+        .Value(request_id)
+        .EndDict()
+        .Build();
+
   } else {
-    json::Node node(json::Dict{{"request_id"s, request_id},
-                               {"error_message"s, "not found"s}});
-    return node;
+    return json::Builder{}
+        .StartDict()
+        .Key("request_id"s)
+        .Value(request_id)
+        .Key("error_message"s)
+        .Value("not found"s)
+        .EndDict()
+        .Build();
   }
 }
 
@@ -196,9 +220,14 @@ json::Document JsonReader::GetJsonAnswers() {
           if (str[str.size() - 1] == '\n') {
             str.resize(str.size() - 1);
           }
-          json::Node node{
-              json::Dict{{"map"s, str}, {"request_id"s, request_id}}};
-          nodes.push_back(node);
+          nodes.push_back(json::Builder{}
+                              .StartDict()
+                              .Key("map"s)
+                              .Value(str)
+                              .Key("request_id"s)
+                              .Value(request_id)
+                              .EndDict()
+                              .Build());
         }
       }
     }
