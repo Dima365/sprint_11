@@ -86,50 +86,61 @@ void MapRenderer::RenderRouteNames(svg::Document& doc,
     if (!route.bus->stops.empty()) {
       svg::Text text_underlay;
       svg::Text text;
-
-      text_underlay.SetOffset(settings_.bus_label_offset);
-      text_underlay.SetFontSize(settings_.bus_label_font_size);
-      text_underlay.SetFontWeight("bold"s);
-      text_underlay.SetFontFamily("Verdana"s);
-      text_underlay.SetFillColor(settings_.underlayer_color);
-      text_underlay.SetStrokeColor(settings_.underlayer_color);
-      text_underlay.SetStrokeWidth(settings_.underlayer_width);
-      text_underlay.SetStrokeLineCap(svg::StrokeLineCap::ROUND);
-      text_underlay.SetStrokeLineJoin(svg::StrokeLineJoin::ROUND);
-
-      text.SetOffset(settings_.bus_label_offset);
-      text.SetFontSize(settings_.bus_label_font_size);
-      text.SetFontFamily("Verdana"s);
-      text.SetFontWeight("bold"s);
-
-      text.SetFillColor(*iter_color);
-      ++iter_color;
-      if (iter_color == settings_.color_palette.end()) {
-        iter_color = settings_.color_palette.begin();
-      }
-
-      text_underlay.SetData(number);
-      text.SetData(number);
-
-      const Stop* stop_ptr = stop_ptrs_.at(route.first_stop);
-      svg::Point point = sphere_projector(stop_ptr->coord);
-      text_underlay.SetPosition(point);
-      text.SetPosition(point);
-
+      SetDefaultSettingsRouteName(text_underlay, text);
+      SetColor(text, iter_color);
+      SetName(text_underlay, number);
+      SetName(text, number);
+      SetPositionStop(text_underlay, route.first_stop, sphere_projector);
+      SetPositionStop(text, route.first_stop, sphere_projector);
       doc.Add(text_underlay);
       doc.Add(text);
 
       if (route.first_stop != route.last_stop) {
-        stop_ptr = stop_ptrs_.at(route.last_stop);
-        point = sphere_projector(stop_ptr->coord);
-        text_underlay.SetPosition(point);
-        text.SetPosition(point);
-
+        SetPositionStop(text_underlay, route.last_stop, sphere_projector);
+        SetPositionStop(text, route.last_stop, sphere_projector);
         doc.Add(text_underlay);
         doc.Add(text);
       }
     }
   }
+}
+
+void MapRenderer::SetDefaultSettingsRouteName(svg::Text& text_underlay, svg::Text& text) {
+  text_underlay.SetOffset(settings_.bus_label_offset);
+  text_underlay.SetFontSize(settings_.bus_label_font_size);
+  text_underlay.SetFontWeight("bold"s);
+  text_underlay.SetFontFamily("Verdana"s);
+  text_underlay.SetFillColor(settings_.underlayer_color);
+  text_underlay.SetStrokeColor(settings_.underlayer_color);
+  text_underlay.SetStrokeWidth(settings_.underlayer_width);
+  text_underlay.SetStrokeLineCap(svg::StrokeLineCap::ROUND);
+  text_underlay.SetStrokeLineJoin(svg::StrokeLineJoin::ROUND);
+
+  text.SetOffset(settings_.bus_label_offset);
+  text.SetFontSize(settings_.bus_label_font_size);
+  text.SetFontFamily("Verdana"s);
+  text.SetFontWeight("bold"s);
+}
+
+void MapRenderer::SetColor(svg::Text& text,
+                           vector<svg::Color>::iterator& iter_color) {
+  text.SetFillColor(*iter_color);
+  ++iter_color;
+  if (iter_color == settings_.color_palette.end()) {
+    iter_color = settings_.color_palette.begin();
+  }
+}
+
+void MapRenderer::SetName(svg::Text& text, const string& name) {
+  text.SetData(name);
+}
+
+void MapRenderer::SetPositionStop(svg::Text& text,
+                                  const string& stop,
+                                  const SphereProjector& sphere_projector) {
+  const Stop* stop_ptr = stop_ptrs_.at(stop);
+  svg::Point point = sphere_projector(stop_ptr->coord);
+  text.SetPosition(point);
 }
 
 void MapRenderer::RenderStopSymbol(svg::Document& doc,
@@ -152,31 +163,39 @@ void MapRenderer::RenderStopNames(svg::Document& doc,
     if (!stop_ptr->buses.empty()) {
       svg::Text text_underlay;
       svg::Text text;
-
-      text_underlay.SetOffset(settings_.stop_label_offset);
-      text_underlay.SetFontSize(settings_.stop_label_font_size);
-      text_underlay.SetFontFamily("Verdana"s);
-      text_underlay.SetFillColor(settings_.underlayer_color);
-      text_underlay.SetStrokeColor(settings_.underlayer_color);
-      text_underlay.SetStrokeWidth(settings_.underlayer_width);
-      text_underlay.SetStrokeLineCap(svg::StrokeLineCap::ROUND);
-      text_underlay.SetStrokeLineJoin(svg::StrokeLineJoin::ROUND);
-
-      text.SetFillColor("black"s);
-      text.SetOffset(settings_.stop_label_offset);
-      text.SetFontSize(settings_.stop_label_font_size);
-      text.SetFontFamily("Verdana"s);
-
-      svg::Point point = sphere_projector(stop_ptr->coord);
-      text_underlay.SetPosition(point);
-      text_underlay.SetData(name);
-      text.SetPosition(point);
-      text.SetData(name);
-
+      SetDefaultSettingsStopName(text_underlay, text);
+      SetName(text_underlay, name);
+      SetName(text, name);
+      SetPositionStop(text_underlay, stop_ptr->coord, sphere_projector);
+      SetPositionStop(text, stop_ptr->coord, sphere_projector);
       doc.Add(text_underlay);
       doc.Add(text);
     }
   }
+}
+
+void MapRenderer::SetDefaultSettingsStopName(svg::Text& text_underlay,
+                                             svg::Text& text) {
+  text_underlay.SetOffset(settings_.stop_label_offset);
+  text_underlay.SetFontSize(settings_.stop_label_font_size);
+  text_underlay.SetFontFamily("Verdana"s);
+  text_underlay.SetFillColor(settings_.underlayer_color);
+  text_underlay.SetStrokeColor(settings_.underlayer_color);
+  text_underlay.SetStrokeWidth(settings_.underlayer_width);
+  text_underlay.SetStrokeLineCap(svg::StrokeLineCap::ROUND);
+  text_underlay.SetStrokeLineJoin(svg::StrokeLineJoin::ROUND);
+
+  text.SetFillColor("black"s);
+  text.SetOffset(settings_.stop_label_offset);
+  text.SetFontSize(settings_.stop_label_font_size);
+  text.SetFontFamily("Verdana"s);
+}
+
+void MapRenderer::SetPositionStop(svg::Text& text,
+                     const Coordinates coord,
+                     const SphereProjector& sphere_projector) {
+  svg::Point point = sphere_projector(coord);
+  text.SetPosition(point);
 }
 
 }  // namespace renderer

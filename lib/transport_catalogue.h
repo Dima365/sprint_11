@@ -47,6 +47,10 @@ class Catalogue {
   std::unordered_map<std::string, Stop*> stopsPtr_;
   std::unordered_map<std::pair<Stop*, Stop*>, uint32_t, PairHasher>
       distanceBetweenStops_;
+
+  void SetLengthAndCurvature(Bus& bus, const std::vector<std::string>& stops);
+  void SetNumberStopsAndUniqueStops(Bus& bus, const std::vector<std::string>& stops);
+  void AddRouteToStops(const std::string& number, const std::vector<std::string>& stops);
 };
 
 }  // namespace transport

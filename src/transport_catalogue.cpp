@@ -9,8 +9,17 @@ using namespace std;
 namespace transport {
 
 void Catalogue::AddRoute(const string& number, vector<string>&& stops) {
+  AddRouteToStops(number, stops);
   Bus bus;
-  bus.stopsOnRoute = stops.size();
+  SetLengthAndCurvature(bus, stops);
+  SetNumberStopsAndUniqueStops(bus, stops);
+  bus.stops = move(stops);
+  buses_.push_back(bus);
+  busesPtr_.insert({number, &buses_.back()});
+}
+
+void Catalogue::SetLengthAndCurvature(Bus& bus,
+                                      const vector<string>& stops) {
   double geographicLength = 0;
   for (size_t i = 0; i < stops.size() - 1 && stops.size() != 0; ++i) {
     pair<string, string> stops_pair{stops[i], stops[i + 1]};
@@ -19,17 +28,21 @@ void Catalogue::AddRoute(const string& number, vector<string>&& stops) {
                                         stopsPtr_[stops[i + 1]]->coord);
   }
   bus.curvature = double(bus.routeLength) / geographicLength;
+}
+
+void Catalogue::SetNumberStopsAndUniqueStops(Bus& bus, const vector<string>& stops) {
   unordered_set<string> stopsSet;
   for (const string& stop : stops) {
     stopsSet.insert(stop);
   }
   bus.uniqueStops = stopsSet.size();
+  bus.stopsOnRoute = stops.size();
+}
+
+void Catalogue::AddRouteToStops(const string& number, const vector<string>& stops) {
   for (auto& stop : stops) {
     stopsPtr_[stop]->buses.insert(number);
-  }
-  bus.stops = move(stops);
-  buses_.push_back(bus);
-  busesPtr_.insert({number, &buses_.back()});
+  } 
 }
 
 void Catalogue::AddStop(const string& name, Coordinates coord) {

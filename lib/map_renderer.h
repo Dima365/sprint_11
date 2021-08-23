@@ -113,6 +113,17 @@ class MapRenderer {
                         const SphereProjector& sphere_projector);
   void RenderStopNames(svg::Document& doc,
                        const SphereProjector& sphere_projector);
+
+  void SetDefaultSettingsRouteName(svg::Text& text_underlay, svg::Text& text);
+  void SetDefaultSettingsStopName(svg::Text& text_underlay, svg::Text& text);
+  void SetColor(svg::Text& text, std::vector<svg::Color>::iterator& iter_color);
+  void SetName(svg::Text& text, const std::string& name);
+  void SetPositionStop(svg::Text& text,
+                       const std::string& stop,
+                       const SphereProjector& sphere_projector);
+  void SetPositionStop(svg::Text& text,
+                       const Coordinates coord,
+                       const SphereProjector& sphere_projector);
 };
 
 }  // namespace renderer
